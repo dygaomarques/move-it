@@ -1,8 +1,13 @@
 import { createContext, ReactNode, useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect'
 import Cookie from 'js-cookie';
 
 // Importando "database" de desafios
 import challenges from '../../challenges.json';
+
+/** 
+ * COMPONENTES
+*/
 import { LevelUpModal } from '../components/LevelUpModal';
 
 /** 
@@ -148,7 +153,7 @@ export function ChallengeProvider({ children, ...rest }: ChallengeProviderProps)
     new Audio('/notification.mp3').play();
 
     // Enviando a notificação de novo desafio
-    if (Notification.permission === 'granted') {
+    if (!isMobile && Notification.permission === 'granted') {
       new Notification('Novo desafio 🎉',{
         body: `Valendo ${challenge.amount} xp`
       });

@@ -21,6 +21,7 @@
   height: 4px;
   border-radius: 4px;
   background: var(--green);
+  transition: cubic-bezier(0,.99,.54,.63) 1000ms;
 }
 
 .currentExperience {

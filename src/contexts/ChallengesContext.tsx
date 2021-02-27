@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 
 // Importando "database" de desafios
 import challenges from '../../challenges.json';
@@ -34,6 +34,7 @@ interface ChallengeContextData {
   levelUp: () => void;
   startNewChallenge: () => void;
   resetChallenge: () => void;
+  completeChallenge: () => void;
 }
 
 /**
@@ -60,10 +61,43 @@ export function ChallengeProvider({ children }: ChallengeProviderProps) {
   // Calculo da experiência necessária para usuário alcançar o próximo nível
   const experienceToNextLevel = Math.pow((level + 1) * 4, 2);
 
+  /**
+   * Pedindo autorização para exibir notificações
+   */
+  useEffect(() => {
+    Notification.requestPermission();
+  }, []);
 
-  
+
+  /**
+   * Função responsável por subir o nível do usuário
+   */
   function levelUp() {
+
+    // Subindo o nível
     setLevel(level + 1);
+  }
+
+  /**
+   * Função para subir o XP do usuário
+   */
+  function completeChallenge() {
+    if (!activeChallenge) {
+      return;
+    }
+
+    const { amount } = activeChallenge;
+
+    let finalExperience = currentExperience + amount;
+
+    if (finalExperience >= experienceToNextLevel) {
+      finalExperience = finalExperience - experienceToNextLevel;
+      levelUp();
+    }
+
+    setCurrentExperience(finalExperience);
+    setActiveChallenge(null);
+    setChallengesCompleted(challengesCompleted + 1);
   }
 
   /**
@@ -79,6 +113,16 @@ export function ChallengeProvider({ children }: ChallengeProviderProps) {
 
     // Definindo o desafio ativo
     setActiveChallenge(challenge);
+
+    // Tocando o audio da notificação
+    new Audio('/notification.mp3').play();
+
+    // Enviando a notificação de novo desafio
+    if (Notification.permission === 'granted') {
+      new Notification('Novo desafio 🎉',{
+        body: `Valendo ${challenge.amount} xp`
+      });
+    }
   }
 
   /**
@@ -103,7 +147,8 @@ export function ChallengeProvider({ children }: ChallengeProviderProps) {
       activeChallenge,
       startNewChallenge,
       resetChallenge,
-      experienceToNextLevel
+      experienceToNextLevel,
+      completeChallenge
     }}>
 
       {/* Este código permite que "ChallengeContext" receba um outro componente

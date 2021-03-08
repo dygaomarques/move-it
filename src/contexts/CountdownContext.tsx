@@ -42,7 +42,7 @@ export function CountdownProvider({ children }: CountdownProviderProps) {
   let countdownTime;
 
   // Data
-  const [time, setTime] = useState(0.1 * 60);
+  const [time, setTime] = useState(50 * 60);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
   const [hasFinished, setHasFinished] = useState(false);
 
